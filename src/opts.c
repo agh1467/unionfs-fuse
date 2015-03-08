@@ -292,6 +292,7 @@ static void print_help(const char *progname) {
 	"    -o hide_meta_files     \".unionfs\" is a secret directory not\n"
 	"                           visible by readdir(), and so are\n" 
         "                           .fuse_hidden* files\n"
+	"    -o hide_symlinks       Hide symlinks, readdir() will not display them\n"
 	"    -o max_files=number    Increase the maximum number of open files\n"
 	"    -o relaxed_permissions Disable permissions checks, but only if\n"
 	"                           running neither as UID=0 or GID=0\n"
@@ -382,6 +383,9 @@ int unionfs_opt_proc(void *data, const char *arg, int key, struct fuse_args *out
 		case KEY_HIDE_META_FILES:
 		case KEY_HIDE_METADIR:
 			uopt.hide_meta_files = true;
+			return 0;
+		case KEY_HIDE_SYMLINKS:
+			uopt.hide_symlinks = true;
 			return 0;
 		case KEY_MAX_FILES:
 			set_max_open_files(arg);

@@ -29,6 +29,7 @@ typedef struct {
 	char *dbgpath;		// debug file we write debug information into
 	pthread_rwlock_t dbgpath_lock; // locks dbgpath
 	bool hide_meta_files;
+	bool hide_symlinks;
 	bool relaxed_permissions;
 
 } uopt_t;
@@ -41,6 +42,7 @@ enum {
 	KEY_HELP,
 	KEY_HIDE_META_FILES,
 	KEY_HIDE_METADIR,
+	KEY_HIDE_SYMLINKS,
 	KEY_MAX_FILES,
 	KEY_NOINITGROUPS,
 	KEY_RELAXED_PERMISSIONS,

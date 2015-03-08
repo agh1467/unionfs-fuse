@@ -59,6 +59,39 @@ static bool hide_meta_files(int branch, const char *path, struct dirent *de)
 }
 
 /**
+  * Hide symlinks function. Used when hide_symlinks option is passed
+  * 
+  */
+static bool hide_symlinks(const char *path, struct dirent *de)
+{
+
+	// Can't get this to work at the moment, so always enabled for now ...
+	//if (uopt.hide_symlinks == false) RETURN(false);
+
+	// Reference: https://www.securecoding.cert.org/confluence/display/c/POS30-C.+Use+the+readlink%28%29+function+properly
+
+	// Combine the two paths into a single string
+
+	char * full_path = malloc(snprintf(NULL, 0, "%s %s", path, de->d_name) + 1);
+	sprintf(full_path, "%s%s", path, de->d_name);
+
+	fprintf(stderr, "checking if path is symlink: %s\n", full_path);
+
+	struct stat p_statbuf;
+	lstat(full_path, &p_statbuf);
+
+	// Is the file a symbolic link?
+	if (S_ISLNK(p_statbuf.st_mode) == 1) {
+		//fprintf(stderr, "%s is a symbolic link\n", full_path);
+		RETURN(true);
+	} else {
+		//fprintf(stderr, "%s is NOT a symbolic link\n", full_path);
+	RETURN(false);
+	}
+
+}
+
+/**
  * Check if fname has a hiding tag and return its status.
  * Also, add this file and to the hiding hash table.
  * Warning: If fname has the tag, fname gets modified.
@@ -151,6 +184,11 @@ int unionfs_readdir(const char *path, void *buf, fuse_fill_dir_t filler, off_t o
 
 		struct dirent *de;
 		while ((de = readdir(dp)) != NULL) {
+			if (hide_symlinks(p, de) == true) {
+				fprintf(stderr, "Hiding %s because symbolic link\n", de->d_name);
+				continue;
+			}
+
 			// already added in some other branch
 			if (hashtable_search(files, de->d_name) != NULL) continue;
 
