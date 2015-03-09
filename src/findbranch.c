@@ -65,6 +65,12 @@ static int find_branch(const char *path, searchflag_t flag) {
 		struct stat stbuf;
 		int res = lstat(p, &stbuf);
 
+		// Is the file a symbolic link and hide_symlinks enabled?
+		if (S_ISLNK(stbuf.st_mode) == 1 && uopt.hide_symlinks == true) {
+			// ignore symbolic links, continue looking on next branch
+			continue;
+		}
+
 		DBG("%s: res = %d\n", p, res);
 
 		if (res == 0) { // path was found
